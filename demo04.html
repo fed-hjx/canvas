@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>轨迹运动</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<style type="text/css">
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        overflow: hidden;
+    }
+
+    canvas {
+        background: #000;
+    }
+</style>
+
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+<script type="text/javascript">
+    (function (win, el) {
+        var canvas = document.querySelector(el),
+            ctx = canvas.getContext('2d');
+        canvas.width = win.innerWidth;
+        canvas.height = win.innerHeight;
+        var center = {//中心位置
+            x: canvas.width / 2,
+            y: canvas.height / 2
+        };
+        var angle = 0, speed = 0.1, radius = 50, radius2 = 60;
+
+        function Ball() {
+            this.x = center.x;
+            this.y = center.y - radius;
+            this.radius = 5;
+            this.color = 0; //颜色变化
+        }
+        Ball.prototype.draw = function () {
+            ctx.beginPath();
+            ctx.fillStyle = 'hsl(' + this.color + ',100%,50%)';
+            ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+            ctx.fill();
+        }
+        var ball = new Ball()
+        function animateBall() {
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';//拖尾效果
+            ctx.fillRect(0, 0, canvas.width, canvas.height);//拖尾效果
+
+            ball.x = center.x + Math.sin(angle) * radius;//圆形轨迹运动
+            ball.y = center.y + Math.cos(angle) * radius;//圆形轨迹运动，将这里的radius换成radius2就成会变成椭圆轨迹运动
+
+            angle -= speed;
+            ball.color += 1;
+            ball.draw()
+            requestAnimationFrame(animateBall);
+        }
+        requestAnimationFrame(animateBall);
+    })(window, '#canvas')
+
+</script>
+
+</html>

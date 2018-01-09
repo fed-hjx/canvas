@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>粒子喷泉</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<style type="text/css">
+	*{
+		margin: 0;
+		padding: 0;
+	}
+        body{
+                overflow:hidden;
+        }
+	canvas{
+		background: #000;
+	}
+</style>
+<body>
+	<canvas id="canvas"></canvas>
+</body>
+<script type="text/javascript">
+(function(win,el){
+	var canvas = document.querySelector(el),
+		ctx = canvas.getContext('2d');
+		canvas.width = win.innerWidth;
+		canvas.height = win.innerHeight;
+
+	var dots = {//粒子对象
+		num: 350,//产生粒子的数量
+		array: []//存放粒子的数组
+	};
+	var mousePosition = {//鼠标位置对象，初始位置为canvas中间
+		x: canvas.width/2,
+		y: canvas.height/2
+	};
+	function Dot(){
+		this.x = mousePosition.x;
+		this.y = mousePosition.y;
+		this.vx = Math.random()*4 -2;//粒子的x轴方向-2~2
+		this.vy = Math.random()*2-4;//粒子的y轴方向-4~-2
+		this.radius = 5;
+		this.gravity = 0.1; //重力系数
+		this.color = 1; //颜色变化
+	}
+	Dot.prototype.draw = function(){
+		ctx.beginPath();
+		ctx.fillStyle = 'hsl('+this.color+',100%,50%)';
+		ctx.arc(this.x,this.y,this.radius,0,2*Math.PI,false);
+		ctx.fill();
+	}
+	function createDots(){
+		dots.array.push(new Dot)
+	}
+	function deleteDots(){
+		dots.array.shift();
+	}
+	function moveDots(){
+		for (var i = 0; i < dots.array.length; i++) {
+			dots.array[i].vy += dots.array[i].gravity;
+			dots.array[i].x += dots.array[i].vx;
+			dots.array[i].y += dots.array[i].vy;
+			dots.array[i].color += 2;
+		};
+	}
+	function drawDots(){
+		createDots();
+		for (var i = 0; i < dots.array.length; i++) {
+			dots.array[i].draw()
+		};
+	}
+	function animateDots(){
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+	    moveDots();
+	    drawDots();
+	    if(dots.array.length >= dots.num){
+	    	deleteDots()
+	    }
+    	requestAnimationFrame(animateDots);	
+	}
+
+	canvas.addEventListener('mousemove',function(e){
+		mousePosition.x = e.pageX;
+    	mousePosition.y = e.pageY;
+	})
+	canvas.addEventListener('mouseleave',function(e){
+		mousePosition.x = canvas.width/2;
+    	mousePosition.y = canvas.height/2;
+	})
+  	requestAnimationFrame(animateDots);	
+})(window,'#canvas')
+
+</script>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>刮刮乐</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<style type="text/css">
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        overflow: hidden;
+    }
+
+    canvas {
+        background: url(http://img3.iqilu.com/data/attachment/forum/201308/22/085546j0ririiunwsiiwbe.jpg) no-repeat center/100% 100%;
+    }
+</style>
+
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+<script type="text/javascript">
+    (function (win, el) {
+        var canvas = document.querySelector(el),
+            ctx = canvas.getContext('2d');
+        canvas.width = win.innerWidth;
+        canvas.height = win.innerHeight;
+
+        ctx.fillStyle = '#CCC';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);//绘制灰色蒙版
+
+
+        ctx.globalCompositeOperation = 'destination-out';//原有图形中与新图形不重叠的部分会被保留
+        ctx.lineWidth = 60;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        var isUp = true;
+        canvas.addEventListener('mousedown', function (e) {
+            isUp = false;
+            ctx.moveTo(e.pageX, e.pageY)
+        })
+        canvas.addEventListener('mousemove', function (e) {//模拟刮卡行为
+            if (isUp) return;
+            ctx.fillStyle = 'yellow';
+            ctx.lineTo(e.pageX, e.pageY);
+            ctx.stroke()
+        })
+        canvas.addEventListener('mouseup', function (e) {
+            isUp = true;
+        })
+        canvas.addEventListener('mouseout', function (e) {
+            isUp = true;
+        })
+    })(window, '#canvas')
+
+</script>
+
+</html>

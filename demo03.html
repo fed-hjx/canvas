@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>带粒子的进度条</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<style type="text/css">
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        overflow: hidden;
+    }
+
+    canvas {
+        background: #000;
+    }
+</style>
+
+<body>
+    <canvas id="canvas">你的浏览器太low啦</canvas>
+</body>
+<script type="text/javascript">
+    (function (win, el) {
+        var canvas = document.querySelector(el),
+            ctx = canvas.getContext('2d');
+        canvas.width = win.innerWidth;
+        canvas.height = win.innerHeight;
+
+        var config = {//基础配置
+            x: 100, //进度条起点x
+            y: canvas.height / 2,//进度条起点y
+            speed: 5, //进度条速度
+            dotNum: 50, //控制粒子数量
+            dotArr: [] //粒子实例数组
+        };
+        function Line(sx, sy, ex, ey, color) {
+            this.sx = sx || config.x;
+            this.sy = sy || config.y;
+            this.ex = ex || config.x;
+            this.ey = ey || config.y;
+            this.color = color || 'white'
+        }
+        Line.prototype.draw = function () {
+            ctx.beginPath();
+            ctx.strokeStyle = this.color;
+
+            ctx.lineCap = 'round';//设置圆形线帽
+
+            ctx.shadowBlur = 40; //阴影模糊级别
+            ctx.shadowColor = 'red';//阴影模糊颜色
+
+            ctx.lineWidth = 10; //线条宽度
+
+            ctx.moveTo(this.sx, this.sy)//绘制线条
+            ctx.lineTo(this.ex, this.ey)//绘制线条
+            ctx.stroke();
+        }
+        function Dot(x, y) {
+            this.x = x;
+            this.y = y;
+            this.vx = Math.random() - 2;//x轴方向 
+            this.vy = Math.random() * 6 - 3;//y轴方向
+            this.r = Math.random() + 1;//点的半径
+            this.alpha = 1;//透明度
+            this.color = 0;
+        }
+        Dot.prototype.draw = function () {
+            ctx.beginPath();
+            ctx.fillStyle = 'hsl(' + this.color + ',100%,50%)';
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = 'white';
+            ctx.globalAlpha = this.alpha;//设置透明度
+            ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+            ctx.fill()
+        }
+        function createDots(x, y) {//创建点
+            config.dotArr.push(new Dot(x, y));
+        }
+        function moveDots() {//移动点
+            for (var i = 0; i < config.dotArr.length; i++) {
+                if (config.dotArr[i].alpha <= 0) {
+                    config.dotArr[i].alpha = 0;
+                } else {
+                    config.dotArr[i].alpha -= 0.01;//点的透明度--
+                }
+                config.dotArr[i].x += config.dotArr[i].vx;//移动点
+                config.dotArr[i].y += config.dotArr[i].vy;//移动点
+                config.dotArr[i].color++;//颜色变化
+            };
+        }
+        function drawDots() {
+            for (var i = 0; i < config.dotArr.length; i++) {
+                config.dotArr[i].draw();
+            };
+        }
+        function drawBgLine() {
+            ctx.beginPath();
+            ctx.shadowBlur = 0; //把阴影模糊去掉
+            ctx.strokeStyle = 'gray';
+            ctx.lineCap = 'round';
+            ctx.lineWidth = 10;
+            ctx.moveTo(config.x, config.y)
+            ctx.lineTo(canvas.width - config.x, config.y)
+            ctx.stroke();
+        }
+        var line = new Line();
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawBgLine();
+            if (line.ex >= (canvas.width - 100)) {//进度100时重新绘制
+                line.ex = 100;
+            }
+            line.ex += config.speed;
+            line.draw();
+            createDots(line.ex, line.ey - 5);
+            moveDots();
+            drawDots();
+            if (config.dotArr.length >= config.dotNum) config.dotArr.shift();
+
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+    })(window, '#canvas')
+
+</script>
+
+</html>
